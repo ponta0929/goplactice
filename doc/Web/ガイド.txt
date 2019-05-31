@@ -1,0 +1,66 @@
+ioライブラリで使う場合Stringじゃなくて[]byteの方が勝手が良い
+return ioutil.WriteFile(filename, p.Body, 0600)
+    0600がUNIXの書き込み権限とかと一緒
+    上手くいくとnilが返る
+    指定がなければ実行時のカレントディレクトリにファイルができる
+
+ファイル名読み込み
+body, err := ioutil.ReadFile(filename)
+if err != nil {
+    return nil, err
+}
+return &Page{Title: title, Body: body}, nil
+    if文から↓のエラー処理は割といっぱい出てきそう
+
+[]byte("これはサンプルページです")
+    Stringのbyte変換
+
+http.HandleFunc("/", handler.SampleHandler)
+    こんな感じで書くとHTTPリクエストの全てのパスをハンドリングする
+http.ListenAndServe(":8080", nil)
+    8080ポートでサーバとして起動する
+    何らかのエラーで終了するため戻り値は必ずエラー
+
+"html/template"
+    t, _ := template.ParseFiles("../static/edit.html")
+    でtにTemplateが返る
+    *template.Template.
+    t.Execute()でレスポンスのボディにHTMLを記載する
+
+サーバーレスポンス
+    サーバ側でリソースが見つからない等でエラーが起きた場合、
+    それをユーザ側に伝えてやる必要がある
+    そのためにリダイレクトやErrorを使う
+    http.Redirect(w, r, "/edit/"+title, http.StatusFound)
+        でリダイレクトできる
+    http.Error(w, err.Error(), http.StatusInternalServerError)
+        でエラーをユーザ側に通知できる
+
+キャッシュ
+    下記のようにtemplate.Mustを使うことで、テンプレートをキャッシュ出来る（グローバル）
+    template.ParseFilesは、引数のテンプレートの呼び込みを行う
+    var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
+
+アクセス制御
+    var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
+    のような形でサーバ側に許すパスを定義できる
+    こんな感じの関数を作って使う
+        func getTitle(w http.ResponseWriter, r *http.Request) (string, error) {
+            m := validPath.FindStringSubmatch(r.URL.Path)
+            if m == nil {
+                http.NotFound(w, r)
+                return "", errors.New("Invalid Page Title")
+            }
+            return m[2], nil // The title is the second subexpression.
+        }
+
+クロージャ―の利用
+    冗長な記述が増えてきたときに使う？
+    決まった作法（入力チェック→関数実行）とかする時に
+    入力を元に関数を実行する関数を返すように作っとくと記述が簡単になる
+    func makeHandler(fn func (http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
+        return func(w http.ResponseWriter, r *http.Request) {
+            // Here we will extract the page title from the Request,
+            // and call the provided handler 'fn'
+        }
+    }

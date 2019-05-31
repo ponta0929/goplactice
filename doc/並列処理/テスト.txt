@@ -1,0 +1,16 @@
+
+○　ベンチマーク
+こんな感じの関数をテストファイルにかく
+func BenchmarkDeclarationCannel(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		parallel.DeclarationChannel()
+	}
+}
+
+b.N回ベンチタイム中にループさせる
+特定のベンチマークのみ起動させるとき
+go test -benchtime=10s -run=aaa -bench=Dec
+
+-benchtimeがベンチマークの実行時間
+-run=aaaは他の変な関数が実行されないようにする
+-benchは実行するベンチマークの指定でBenchmarkを除いた部分で検索がかかる

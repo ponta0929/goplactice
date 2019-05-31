@@ -1,0 +1,17 @@
+使えそうなパッケージ
+    "fmt"
+        printlnとかある
+    
+    "math"
+        計算系
+        "math/rand" で乱数生成とか
+    
+    "net/http"
+        Webサーバ関連
+
+    "log"
+        ロガー
+
+    "html/template"
+        htmlを扱うためのパッケージ
+

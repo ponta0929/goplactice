@@ -1,0 +1,66 @@
+インストール
+	公式からインストール用のファイルを落として実行するだけっぽい
+	アップグレードの際は、一回既存のバージョンを削除してから入れなおす
+	
+	インストール後そのままCMDからgoで起動する
+	システムの詳細設定にパスが勝手に出来る
+	設定はgo envで確認できる
+	変える時は詳細設定から変えるらしい
+	GOPATHがワークスペース
+
+ワークスペースの変え方
+    https://github.com/golang/go/wiki/SettingGOPATH
+    基本システムの詳細設定でパス変えてやればいいっぽい
+	go envの実行結果変わらないのは気になるけど・・
+	
+まずはHello World
+	GOPATHで指定したワークスペースに移動して
+	src/helloディレクトリを作る
+
+	フォルダにhello.goを作成
+	開発環境はVSCでよさそう
+	下記コピペ
+	＞＞＞＞＞＞＞＞＞＞＞＞＞＞
+	package main
+
+	import "fmt"
+
+	func main() {
+		fmt.Printf("hello, world\n")
+	}
+	＞＞＞＞＞＞＞＞＞＞＞＞＞＞
+
+	C:\0_work\golang\src\hello
+	にCMDから移動
+	go buildでそのままコンパイルする
+	コンパイルした同フォルダ上にhello.exeが出来る
+	cmd　から　helloでアプリが起動する
+
+実行ファイルの生成について
+	go install
+		バイナリが/bin以下に出来る
+	go clean -i
+		/binの該当パッケージの？exeを消す
+		-i付けないとどうなるか不明
+
+
+開発環境
+	VSCで開発できる
+	GOはそれ用の拡張はメジャーが一個あってそれ使えばよさそう
+	開発に必要なあれこれは、Githubから勝手に落してくる
+	落とせない環境だとめんどいかも
+	作業フォルダ/binにexeが落ちる
+
+	Installing 12 tools at C:\0_work\golang\bin
+	gocode
+	gopkgs
+	go-outline
+	go-symbols
+	guru
+	gorename
+	dlv
+	gocode-gomod
+	godef
+	godef-gomod
+	goreturns
+	golint

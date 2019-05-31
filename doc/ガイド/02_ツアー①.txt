@@ -1,0 +1,82 @@
+ツアー
+    公式からできる
+    日本語版がある
+    スタンドアロンでもできる　go tool tuar とからしい
+
+パッケージ
+    GOプログラムはパッケージから構成される
+    package main
+    のプログラムから実行される
+
+    import (
+        "fmt"
+        "math/rand"
+    )
+    とかで他のパッケージをインポートできる
+    パッケージ名はインポート先の最後のパス
+    "math/rand"ならプログラム内でのパッケージ名はrand
+    import aaa "math/rand"
+    で名前を変えられる
+
+    エクスポートネーム
+        GOだと大文字で始まる名前は外部に公開される
+        小文字だと外部に公開されないので、インポート先からは参照できない
+        math.piはアクセスできない
+        math.Piはアクセスできる
+        とか
+
+関数
+    0個以上の引数をとれる
+    型の定義は変数名の後ろに書く
+    戻り値の型は（）の後
+        func Add(aaa int, bbb int) int {
+            return aaa + bbb
+        }
+    引数の型が一緒の場合は aaa, bbb int みたいに省略できる
+    関数の戻り値も複数かける
+        func swap(a, b string)(string, string){
+            return b, a
+        }
+    とか
+    使う側はこんな感じ
+        a, b := swap("aaa", "bbb")
+    
+    戻り値に名前をつけられる
+        func swap(a, b string) (x, y string){
+            x = b
+            y = a
+            return
+        }
+    関数の最初で変数として戻り値の名前の変数が定義される
+    名前を付けた場合return単独でOK
+    可読性が落ちるので乱用は避けた方が良い
+
+変数
+    変数定義はvar
+    ただし型はある
+        var name string
+        var name string = "taro"
+        var name = "taro" //省略できる。省略すると値をもとに型が決まる
+    関数内だと:=で暗黙的な変数宣言ができる
+    関数外だとvarが必要
+        var name string = "aaa"
+        name2 := "bbb"
+    基本型はint string boolを覚えとけばよさそう
+    （その他いろいろある）
+    初期値を与えずに変数宣言すると勝手に初期値が入る
+        bool false
+        int 0
+        string ""
+    型変換は型(変数)
+        i := 11
+        f := float64(i)
+    型変換は明示的な宣言が必要
+
+    定数はconst
+    :=は使えない
+        const WORLD = "世界"
+        とか
+    文字列か真偽値か数字
+
+
+

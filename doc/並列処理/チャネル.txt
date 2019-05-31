@@ -1,0 +1,81 @@
+○ channel(チャネル)
+GO言語における同期処理のプリミティブの１つ
+メモリに対するアクセスを同期するのに使える
+またゴールーチン間の通信に使うのが最適
+チャネルの受信を行った場合、そのゴールーチンは受信があるまでブロックされる
+少なくとも1つの受信があるまでブロックされる
+逆にチャネルに送信を行う場合、そのチャネルに空きが出来るまでそのゴールーチンはブロックされる
+チャネルのブロックが解除されない場合、デッドロックになるので注意
+
+var myChannel chan interface{} //空インタフェース型のチャネル宣言
+myChannel = make(chan interface{}) //チャネルの初期化
+
+送信だけ、受信だけといった一方向のチャネルも作れる
+var recvCh <-chan int //int型の受信専用チャネル
+recvCh = make(<-chan int) //受信専用チャネルの初期化
+var sendCh chan<- int //int型の送信専用チャネル
+sendCh = make(chan<- int) //送信専用チャネルの初期化
+
+送受信専用チャネルは通常の双方向チャネルでも初期化できる
+基本的に送受信専用チャネルは実装に制限を加えたいときに使う
+recvCh = myChannel
+sendCh = myChannel
+
+
+簡単なchannelサンプル
+stringCh := make(chan string)
+go func() {
+    stringCh <- "sample"
+}()
+fmt.Println(<-stringCh)
+
+チャネルに入る値をひたすら表示するようなループ
+rangeとforを使う
+for str := range myChannel {
+    fmt.Println(str)
+}
+
+<-の戻り値は2つある
+str, ok := <-stringCh
+okには真偽値が入る
+読み込みが正しくできたか、あるいは閉じたチャネルのデフォルト値かどうかを判定できる
+チャネルは閉じることができ、それによってこれ以上チャネルにデータが流れないことを宣言できる
+close(チャネル)によって閉じることができる
+閉じたチャネルからも読み込みができる
+intStream := make(chan int)
+go func() {
+    defer close(intStream)
+    for i := 1; i <= 5; i++ {
+        intStream<- i
+    }
+}()
+for integer := range intStream {
+    fmt.Printf("%v ", integer)
+}
+
+range チャネル　でforを回すと、closeをトリガーに関数を抜けられる
+またcloseは同じチャネルを共有する複数のゴールーチンに対する通知に使える
+
+・バッファについて
+var dataStream chan interface{}
+dataStream = make(chan interface{}, 4)
+のように初期化するとバッファが4のチャネルを宣言できる
+これは読み込みが行われなくても4つまで送信ができるチャネルであることを示す
+a := make(chan int)
+b := make(chan int, 0)
+↑の２つは一緒
+このバッファを超えた書き込みはブロックされる（0バッファは最初からブロック）
+
+c := make(chan int, 4) //□□□□
+c <- 1 //1□□□
+c <- 2 //12□□
+c <- 3 //123□
+c <- 4 //1234
+c <- 5 //1234 ←5がブロックされる
+<-c //1 ← 2345
+
+受信先がある場合、上記のようなバッファリングはせず直接値を渡す
+そのためバッファなしチャネルであっても通信はできる（送受信が両方ブロックされるときにデータが渡る）
+バッファをどれだけ用意するかは最適化の話になる
+またデッドロックが発生しにくくなるので、結果として開発中にバグを見つけにくくなる
+なので扱いには注意が必要

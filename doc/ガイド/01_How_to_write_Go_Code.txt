@@ -1,0 +1,90 @@
+
+概要
+    GOだとワークスペースに全てのGOファイルを入れる
+    ワークスペース内に複数のリポジトリがある（Gitとかで管理する単位）
+    リポジトリは最低1個以上のパッケージをもつ
+    各パッケージは、同じディレクトリ内の1つ以上のGOファイルからなる
+    インポートパスはパッケージのディレクトリパス
+
+    他の言語と違うので注意
+
+ワークスペース
+    srcとbinディレクトリをもつ
+    srcはソースファイル置き場
+    binはバイナリ置き場
+    binをシステムのパスに設定しとくとビルド結果を直実行できる
+    デフォルトでパスに設定が追加されてるけど、ワークスペースを変えた場合はこっちも変える
+
+    go install はコンパイルしたいディレクトリで叩くか、
+    src以下のディレクトリを指定して叩くと起動する
+    
+    サンプル
+        bin/
+            hello                          # command executable
+            outyet                         # command executable
+        src/
+            github.com/golang/example/
+                .git/                      # Git repository metadata
+            hello/
+                hello.go               # command source
+            outyet/
+                main.go                # command source
+                main_test.go           # test source
+            stringutil/
+                reverse.go             # package source
+                reverse_test.go        # test source
+            golang.org/x/image/
+                .git/                      # Git repository metadata
+            bmp/
+                reader.go              # package source
+                writer.go              # package source
+            ... (many more repositories and packages omitted) ...
+
+
+インポート
+    標準のライブラリは短いインポートパスが与えられてる
+    自前のやつはその辺と競合しないパスにする必要がある
+    github.com/userが慣例
+
+    適当にフォルダを作ってもう一個GOファイルを書く
+    この辺の書き方はまだよくわからないが、
+    package パッケージ名
+    とfunc Reverseのあたりがライブラリ定義っぽい
+
+    作ったファイルをgo buildでビルドする
+    キャッシュの方に出力されるので実行ファイルはできないらしい
+    helloの方から下記でインポート
+
+    import (
+        "fmt"
+
+        "github.com/user/stringutil"
+    )
+
+    処理を書いてないとセーブ時に勝手に定義が消える（Linterのせいっぽいけど）
+    この辺は慣れ？
+    先にstringutilとか書いてもよさそう
+
+    パッケージ名は同ディレクトリ内では同じもの
+    カレントディレクトリの名前がパッケージになる
+    github.com/golang/example/ならexampleパッケージ
+    パッケージ自体が一意である必要はない
+    ただインポートした複数パッケージが同名だとエラーっぽい
+    import local名 "パッケージ"
+    で名前変えられるのでなんでもよさそう
+
+テスト
+    テストフレームワークをもってる
+    パッケージのテスト用
+    テスト対象ファイル名_test.goのfunc Testテスト対象関数(t *testing.T)がお作法っぽい
+    go test パッケージで走る
+    こんな感じ
+        package parallel
+
+        import "testing"
+
+        func TestSample1(t *testing.T) {
+            Sample1()
+        }
+
+    

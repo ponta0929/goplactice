@@ -1,0 +1,136 @@
+
+ポインタ
+    GOはポインタがある
+    型の前に*をつけるとポインタになる
+    var i *int
+    とか
+    デフォルト値はnil
+    nilはnullみたいなもの？
+
+    &でその変数への参照を取得できる
+    i := 10
+    p := &i
+    ポインタ変数に*をつけると参照先の値を読む
+    *p  //10
+    とか
+    ポインタ演算はできない
+
+構造体
+    struct
+    フィールドの集まり
+    type User struct {
+        name string
+        age int
+    }
+    とか
+    user := User{"taro", 19}
+    user.age
+    とか
+    user := User{
+        name: "taro",
+        age: 19,
+    }
+    とか
+
+配列
+    [n]型で個数指定
+    [6]int 
+    とか
+    一度宣言した型のサイズは変更できない
+    配列は固定長
+    一方で[]型はスライスを表し、こっちは可変長
+	primes := [6]int{2, 3, 5, 7, 11, 13}
+	var s []int = primes[1:4]
+
+    とかa[low : high]で指定する
+    スライス自体は単に元の配列への参照があるだけ
+    なので元の値が変わればスライスも変わる
+    [3]bool{true, true, false}
+    は配列リテラル
+    []bool{true, true, false}
+    は配列を生成してそれに対するスライスができる
+    var a = [10]int
+    に対するスライスは下記全て等価
+    a[0:10]
+    a[:10]
+    a[0:]
+    a[:]
+
+    len(スライス)で配列の長さを、cap(スライス)で配列の容量を取得できる
+    %vで配列をprintfできる
+    スライス０はnil
+    make関数でスライスを作れる
+    make([]int, 5, 10)
+    とか。第2引数がlenで第3引数がcap
+    多次元も可
+
+    要素の追加はスライスに対してappend関数を使う
+    appendで元の配列の容量より多く要素を入れると、新しい配列のスライスが返る
+    (もとのスライスは上書きしなければ残る)
+
+    スライスに対してrange を使うとindexと要素の2つを取り出せる
+    forとかで使う
+    i, x := range []int{ 10, 9, 8}
+    とか
+    indexがいらなければ _, x とかくとindexを捨てれる
+    indexだけ必要な場合は　i だけでよい
+
+マップ
+    キー値と値をもつ
+    map[string]int
+    とか
+    何もいれずに生成するとゼロ値のnilが入る
+    nilマップはキー値をもっていない上、追加もできない
+    make関数で作ると追加できるマップを生成してくれる
+    var m = make(map[string]int)
+    m["iti"] = 1
+    初期値ありで生成した場合は普通に追加できる
+    var m = map[string]int {
+        "iti": 1
+    }
+    m["ni"] = 2
+    とか
+
+    下記みたいにforにrangeで突っ込むとiがキー値、objが値になる
+    m := map[string]int{
+		"iti": 1,　//カンマが必要
+	}
+	m["ni"] = 2
+	for i, obj := range m {
+		fmt.Println(i)
+		fmt.Println(obj)
+	}
+    
+    要素の削除はdeleteを使う
+    delete(m,"iti")
+    存在確認は下記
+    elem ,ok := map["ni"]
+    キーに対して値があればokがtrue,なければfalseになる
+
+関数
+    関数も変数として扱える
+    func compute(fn func(float64, float64) float64) float64 {
+        return fn(3, 4)
+    }
+    とか
+    引数と戻り値の型が一致する関数を引数にもてる
+    関数の変数は下記感じ
+    hypot := func(x, y float64) float64 {
+		return math.Sqrt(x*x + y*y)
+	}
+    func(引数型)戻り値型{}
+    みたいな
+
+    GOの関数はクロージャ
+    func adder() func(int) int {
+        sum := 0
+        return func(x int) int {
+            sum += x
+            return sum
+        }
+    }
+    自分の関数の外の変数にアクセスできる
+    add := adder() //returnの関数が返る
+    add() //()で変数内の関数を発火させる
+
+
